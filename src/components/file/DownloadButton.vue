@@ -5,6 +5,9 @@
         <q-item v-close-popup clickable @click="save5emm()">
           <q-item-section>{{ $t('io.export.default') }}</q-item-section>
         </q-item>
+        <q-item v-close-popup clickable @click="save5etools()">
+          <q-item-section>{{ $t('io.export.fivetools') }}</q-item-section>
+        </q-item>
         <q-item v-close-popup clickable @click="saveMd3()">
           <q-item-section>{{ $t('io.export.md3') }}</q-item-section>
         </q-item>
@@ -47,6 +50,8 @@ import copy from 'copy-to-clipboard'
 import { useLatexRenderer } from '../rendering/useLatexRenderer'
 import { useTarrasqueRenderer } from '../rendering/useTarrasqueRenderer'
 import { useImprovedInitRenderer } from '../rendering/useImprovedInitRenderer'
+import { use5etoolsRenderer } from '../rendering/use5etoolsRenderer'
+import { useFileLoader } from './useFileLoader'
 import { snapdom } from '@zumer/snapdom'
 
 import jsonurl from 'json-url'
@@ -63,6 +68,8 @@ export default defineComponent({
     const { renderLatex } = useLatexRenderer()
     const { renderTarrasqueJson } = useTarrasqueRenderer()
     const { renderImprovedInitJson } = useImprovedInitRenderer()
+    const { render5etoolsJson } = use5etoolsRenderer()
+    const { loadMonster } = useFileLoader()
     const codec = jsonurl('lzma')
     const editorStore = useEditorStore()
 
@@ -87,6 +94,32 @@ export default defineComponent({
           type: 'negative',
         })
       }
+    }
+
+    const save5etools = () => {
+      try {
+        download(
+          render5etoolsJson(),
+          `${monster.name}.5etools.json`,
+          'application/json'
+        )
+      } catch (e) {
+        console.error(e)
+
+        $q.notify({
+          message: t('io.error.json', [e]),
+          type: 'negative',
+        })
+      }
+    }
+
+    // dev builds only: lets scripts/test-5etools-export.mjs load a monster and render it
+    // without the file dialog or a download
+    if (process.env.DEV) {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const w = window as any
+      w.__render5etools = render5etoolsJson
+      w.__loadMonster = loadMonster
     }
 
     const saveMd = () => {
@@ -227,6 +260,7 @@ export default defineComponent({
 
     return {
       save5emm,
+      save5etools,
       saveMd,
       saveMd3,
       copyMd,

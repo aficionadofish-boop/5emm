@@ -540,6 +540,7 @@ export default {
     copyMd: 'Copied Markdown (Homebrewery Format) to Clipboard',
     export: {
       default: 'Export JSON (5emm format)',
+      fivetools: 'Export JSON (5etools format, for Roll20 betteR20)',
       md: 'Export Markdown (Homebrewery Legacy)',
       md3: 'Export Markdown (Homebrewery v3)',
       tarrasque: 'Export JSON (Tarrasque.io format)',

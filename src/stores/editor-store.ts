@@ -6,7 +6,8 @@ export const useEditorStore = defineStore({
     return {
       statBlockColumns: 1,
       changelogShown: '',
-      style: '2024',
+      style: '2014', // this fork serves a 2014-rules campaign
+
       condenseImmunities: false,
     }
   },
