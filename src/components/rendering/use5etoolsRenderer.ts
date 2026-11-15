@@ -85,14 +85,14 @@ export function spellTag(name: string) {
 }
 
 // the maker's rendered HTML (b/i/u, div line breaks) -> 5etools entries, with dice and
-// save DCs tagged so 5etools rolls them
+// save DCs tagged so 5etools rolls them. Every line in the editor (a <div> or a <br>) is its
+// own entry, so a list typed one item per line (e.g. the Gear) stays one item per line.
 export function toEntries(html: string): string[] {
   const paragraphs = html
     .replace(/&nbsp;/gi, ' ')
-    .split(/<div><br><\/div>|<br\s*\/?>/gi)
+    .split(/<\/?div>|<br\s*\/?>/gi)
     .map((p) =>
       p
-        .replace(/<\/?div>/gi, ' ')
         .replace(/<\/?u>/gi, '')
         .replace(/<b>(.*?)<\/b>/gi, '{@b $1}')
         .replace(/<i>(.*?)<\/i>/gi, '{@i $1}')

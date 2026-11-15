@@ -120,6 +120,7 @@ export default defineComponent({
       const w = window as any
       w.__render5etools = render5etoolsJson
       w.__loadMonster = loadMonster
+      w.__monster = monster
     }
 
     const saveMd = () => {

@@ -6,9 +6,10 @@
 // with betteR20's attack regexes (betterR20 js/5etools-importer.js, _baseAddAction).
 // The official Monster Manual block goes through the same pipeline; the two are compared.
 //
-// usage: node scripts/test-5etools-export.mjs <5etools-2014-src dir> [app url]
+// usage: node scripts/test-5etools-export.mjs <5etools-2014-src dir> [app url] [file.5etools.json ...]
 //   the 5etools dir needs js/ and data/bestiary/bestiary-mm.json
 //   app url defaults to http://localhost:9124/5emm/#/ (NO_OPEN=1 npx quasar dev --port 9124)
+//   any .json files given (exports saved from the app) are checked too, alone
 import { spawn } from 'node:child_process'
 import { mkdtempSync, readFileSync, readdirSync, writeFileSync } from 'node:fs'
 import { tmpdir } from 'node:os'
@@ -18,7 +19,9 @@ import { pathToFileURL } from 'node:url'
 const CHROME = 'C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe'
 const PORT = 9334
 const FIVETOOLS = resolve(process.argv[2] ?? '')
-const APP = process.argv[3] ?? 'http://localhost:9124/5emm/#/'
+const EXTRA = process.argv.slice(3).filter((a) => a.endsWith('.json'))
+const APP =
+  process.argv.slice(3).find((a) => !a.endsWith('.json')) ?? 'http://localhost:9124/5emm/#/'
 const PRESETS = resolve('src/data/templates/monsters')
 
 // differences from the MM that are not the exporter's doing
@@ -117,6 +120,11 @@ try {
     exported[file.replace('.5emm.json', '')] = JSON.parse(
       await app('window.__render5etools()')
     ).monster[0]
+  }
+  for (const file of EXTRA) {
+    for (const m of JSON.parse(readFileSync(resolve(file), 'utf-8')).monster) {
+      exported[`${m.name} [file]`] = m
+    }
   }
 
   // 2. a page with 5etools' renderer
